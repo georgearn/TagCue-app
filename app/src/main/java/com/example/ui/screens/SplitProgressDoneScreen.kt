@@ -230,7 +230,7 @@ fun SplitProgressDoneScreen(
                         onClick = { viewModel.setSplitStep(SplitStep.SPLIT_HOME) },
                         modifier = Modifier
                             .weight(1f)
-                            .height(44.dp)
+                            .height(48.dp)
                             .testTag("btn_split_another_cue"),
                         shape = MaterialTheme.shapes.medium
                     ) {
@@ -243,7 +243,7 @@ fun SplitProgressDoneScreen(
                         onClick = { viewModel.openSplitFilesIntoTagEditor() },
                         modifier = Modifier
                             .weight(1.3f)
-                            .height(44.dp)
+                            .height(48.dp)
                             .testTag("btn_open_split_in_tag_editor"),
                         shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
