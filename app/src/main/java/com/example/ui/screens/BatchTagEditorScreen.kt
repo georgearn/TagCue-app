@@ -144,7 +144,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.Numbers, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Auto-Number", style = MaterialTheme.typography.labelSmall)
+                        Text("Auto-Number", style = MaterialTheme.typography.labelLarge)
                     }
 
                     OutlinedButton(
@@ -155,7 +155,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Tags from Filename", style = MaterialTheme.typography.labelSmall)
+                        Text("Tags from Filename", style = MaterialTheme.typography.labelLarge)
                     }
 
                     OutlinedButton(
@@ -166,7 +166,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Rename Files", style = MaterialTheme.typography.labelSmall)
+                        Text("Rename Files", style = MaterialTheme.typography.labelLarge)
                     }
 
                     OutlinedButton(
@@ -177,7 +177,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Find & Replace", style = MaterialTheme.typography.labelSmall)
+                        Text("Find & Replace", style = MaterialTheme.typography.labelLarge)
                     }
 
                     OutlinedButton(
@@ -188,7 +188,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.FormatSize, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Case Fixes", style = MaterialTheme.typography.labelSmall)
+                        Text("Case Fixes", style = MaterialTheme.typography.labelLarge)
                     }
 
                     OutlinedButton(
@@ -199,7 +199,7 @@ fun BatchTagEditorScreen(
                     ) {
                         Icon(Icons.Default.SpaceBar, contentDescription = null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Trim Spaces", style = MaterialTheme.typography.labelSmall)
+                        Text("Trim Spaces", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -354,7 +354,7 @@ fun BatchTagEditorScreen(
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Review Changes", style = MaterialTheme.typography.titleMedium)
+                    Text("Review Changes", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }

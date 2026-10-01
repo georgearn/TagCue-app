@@ -68,6 +68,7 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.example.model.AlbumGroup
 import com.example.model.ProblemFilter
+import com.example.ui.components.EmptyState
 import com.example.ui.theme.StatTypography
 import com.example.ui.theme.status
 import com.example.viewmodel.AudioTaggerViewModel
@@ -133,7 +134,7 @@ fun LibraryScreen(
                         ) {
                             Icon(Icons.Default.Undo, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Undo", style = MaterialTheme.typography.labelSmall)
+                            Text("Undo", style = MaterialTheme.typography.labelLarge)
                         }
                     }
 
@@ -142,7 +143,7 @@ fun LibraryScreen(
                         modifier = Modifier
                             .height(40.dp)
                             .testTag("btn_select_music_folder"),
-                        shape = MaterialTheme.shapes.small
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Icon(Icons.Default.DriveFolderUpload, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
@@ -235,52 +236,16 @@ fun LibraryScreen(
                     }
                 }
             } else if (uiState.allTracks.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .padding(24.dp),
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.DriveFolderUpload,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(56.dp)
-                            )
-                            Text(
-                                text = "No Music Loaded",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = "Select a music folder containing FLAC, MP3, M4A, OGG, or WAV files to inspect and batch edit metadata.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                            )
-                            Button(
-                                onClick = { folderPickerLauncher.launch(null) },
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier.testTag("btn_choose_folder")
-                            ) {
-                                Text("Choose Music Folder", style = MaterialTheme.typography.labelLarge)
-                            }
-                        }
-                    }
-                }
+                EmptyState(
+                    icon = Icons.Default.DriveFolderUpload,
+                    title = "No Music Loaded",
+                    description = "Select a music folder containing FLAC, MP3, M4A, OGG, or WAV files to inspect and batch edit metadata.",
+                    actionLabel = "Choose Music Folder",
+                    actionIcon = Icons.Default.DriveFolderUpload,
+                    actionTestTag = "btn_choose_folder",
+                    onAction = { folderPickerLauncher.launch(null) },
+                    modifier = Modifier.weight(1f)
+                )
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),

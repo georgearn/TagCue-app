@@ -152,7 +152,7 @@ fun FindReplaceDialog(
                     onApply(selectedField, searchText, replaceText, matchCase, useRegex)
                     onDismiss()
                 },
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.testTag("btn_confirm_find_replace")
             ) {
                 Text("Apply to Selected", style = MaterialTheme.typography.labelLarge)
@@ -244,7 +244,7 @@ fun ChangeCaseDialog(
                     onApply(selectedField, selectedCase)
                     onDismiss()
                 },
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.testTag("btn_confirm_change_case")
             ) {
                 Text("Convert", style = MaterialTheme.typography.labelLarge)
@@ -320,7 +320,7 @@ fun AutoNumberDialog(
                     onApply(start, setTotalTracks)
                     onDismiss()
                 },
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.testTag("btn_confirm_auto_number")
             ) {
                 Text("Apply Numbering", style = MaterialTheme.typography.labelLarge)
@@ -399,7 +399,7 @@ fun FilenameToTagDialog(
                     onApply(pattern)
                     onDismiss()
                 },
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.testTag("btn_confirm_filename_to_tag")
             ) {
                 Text("Extract & Apply", style = MaterialTheme.typography.labelLarge)
@@ -475,7 +475,7 @@ fun RenameFilesDialog(
             Button(
                 onClick = { onApply(pattern) },
                 enabled = pattern.isNotBlank(),
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.testTag("btn_confirm_rename")
             ) {
                 Text("Rename & Apply", style = MaterialTheme.typography.labelLarge)

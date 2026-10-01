@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import com.example.model.CueEncoding
 import com.example.model.CueSheet
 import com.example.model.CueTrack
+import com.example.ui.components.EmptyState
 import com.example.ui.theme.StatTypography
 import com.example.viewmodel.AudioTaggerViewModel
 import com.example.viewmodel.SplitStep
@@ -84,61 +85,15 @@ fun SplitHomeScreen(
 
         if (cueSheet == null) {
             // Empty State
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Surface(
-                    modifier = Modifier.size(72.dp),
-                    shape = MaterialTheme.shapes.large,
-                    color = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Default.CallSplit,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text(
-                    text = "Split FLAC by CUE Sheet",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Select a .cue sheet from local storage. The app parses tracks immediately, fixes non-Unicode/Cyrillic encodings, and splits lossless FLAC tracks.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Button(
-                    onClick = { cuePicker.launch(arrayOf("*/*")) },
-                    modifier = Modifier
-                        .height(48.dp)
-                        .testTag("btn_empty_pick_cue"),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(Icons.Default.FileOpen, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Select .cue File", style = MaterialTheme.typography.titleSmall)
-                }
-            }
+            EmptyState(
+                icon = Icons.Default.CallSplit,
+                title = "Split FLAC by CUE Sheet",
+                description = "Select a .cue sheet from local storage. The app parses tracks immediately, fixes non-Unicode/Cyrillic encodings, and splits lossless FLAC tracks.",
+                actionLabel = "Select .cue File",
+                actionIcon = Icons.Default.FileOpen,
+                actionTestTag = "btn_empty_pick_cue",
+                onAction = { cuePicker.launch(arrayOf("*/*")) }
+            )
         } else {
             // CUE sheet loaded
             LazyColumn(
@@ -204,7 +159,7 @@ fun SplitHomeScreen(
                                         .testTag("btn_pick_cue_sheet"),
                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
                                 ) {
-                                    Text("Change CUE", style = MaterialTheme.typography.labelSmall)
+                                    Text("Change CUE", style = MaterialTheme.typography.labelLarge)
                                 }
                             }
 
@@ -237,7 +192,7 @@ fun SplitHomeScreen(
                                         modifier = Modifier.height(40.dp),
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                                     ) {
-                                        Text("Change", style = MaterialTheme.typography.labelSmall)
+                                        Text("Change", style = MaterialTheme.typography.labelLarge)
                                     }
 
                                     DropdownMenu(
@@ -313,7 +268,7 @@ fun SplitHomeScreen(
                                     containerColor = if (pairedFlac != null) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                                 )
                             ) {
-                                Text(if (pairedFlac != null) "Change" else "Select FLAC", style = MaterialTheme.typography.labelSmall)
+                                Text(if (pairedFlac != null) "Change" else "Select FLAC", style = MaterialTheme.typography.labelLarge)
                             }
                         }
                     }
@@ -378,7 +333,7 @@ fun SplitHomeScreen(
                         shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Configure Output Format", style = MaterialTheme.typography.titleSmall)
+                        Text("Configure Output Format", style = MaterialTheme.typography.labelLarge)
                         Spacer(modifier = Modifier.width(6.dp))
                         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                     }

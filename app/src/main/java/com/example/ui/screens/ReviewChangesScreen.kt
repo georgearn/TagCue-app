@@ -184,7 +184,7 @@ fun ReviewChangesScreen(
                     ) {
                         Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Write Tags to Files", style = MaterialTheme.typography.titleMedium)
+                        Text("Write Tags to Files", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -208,7 +208,7 @@ fun ReviewChangesScreen(
                         showConfirmDialog = false
                         viewModel.applyPendingChangesToDisk()
                     },
-                    shape = MaterialTheme.shapes.small,
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.testTag("btn_modal_write_tags")
                 ) {
                     Text("Write Tags", style = MaterialTheme.typography.labelLarge)

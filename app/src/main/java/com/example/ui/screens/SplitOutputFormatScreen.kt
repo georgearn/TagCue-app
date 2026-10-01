@@ -312,7 +312,7 @@ fun SplitOutputFormatScreen(
                 ) {
                     Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.titleSmall)
+                    Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
