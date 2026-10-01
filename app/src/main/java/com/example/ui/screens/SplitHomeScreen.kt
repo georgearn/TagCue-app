@@ -159,7 +159,7 @@ fun SplitHomeScreen(
                                         .testTag("btn_pick_cue_sheet"),
                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
                                 ) {
-                                    Text("Change CUE", style = MaterialTheme.typography.labelSmall)
+                                    Text("Change CUE", style = MaterialTheme.typography.labelLarge)
                                 }
                             }
 
@@ -192,7 +192,7 @@ fun SplitHomeScreen(
                                         modifier = Modifier.height(40.dp),
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                                     ) {
-                                        Text("Change", style = MaterialTheme.typography.labelSmall)
+                                        Text("Change", style = MaterialTheme.typography.labelLarge)
                                     }
 
                                     DropdownMenu(
@@ -268,7 +268,7 @@ fun SplitHomeScreen(
                                     containerColor = if (pairedFlac != null) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                                 )
                             ) {
-                                Text(if (pairedFlac != null) "Change" else "Select FLAC", style = MaterialTheme.typography.labelSmall)
+                                Text(if (pairedFlac != null) "Change" else "Select FLAC", style = MaterialTheme.typography.labelLarge)
                             }
                         }
                     }
@@ -333,7 +333,7 @@ fun SplitHomeScreen(
                         shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Configure Output Format", style = MaterialTheme.typography.titleSmall)
+                        Text("Configure Output Format", style = MaterialTheme.typography.labelLarge)
                         Spacer(modifier = Modifier.width(6.dp))
                         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                     }

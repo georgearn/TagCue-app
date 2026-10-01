@@ -236,7 +236,7 @@ fun SplitProgressDoneScreen(
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Split Another", style = MaterialTheme.typography.labelMedium)
+                        Text("Split Another", style = MaterialTheme.typography.labelLarge)
                     }
 
                     Button(
@@ -250,7 +250,7 @@ fun SplitProgressDoneScreen(
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Open in Tag Editor", style = MaterialTheme.typography.labelMedium)
+                        Text("Open in Tag Editor", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }

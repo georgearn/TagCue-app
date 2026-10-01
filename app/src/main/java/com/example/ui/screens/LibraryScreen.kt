@@ -134,7 +134,7 @@ fun LibraryScreen(
                         ) {
                             Icon(Icons.Default.Undo, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Undo", style = MaterialTheme.typography.labelSmall)
+                            Text("Undo", style = MaterialTheme.typography.labelLarge)
                         }
                     }
 
@@ -143,7 +143,7 @@ fun LibraryScreen(
                         modifier = Modifier
                             .height(40.dp)
                             .testTag("btn_select_music_folder"),
-                        shape = MaterialTheme.shapes.small
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Icon(Icons.Default.DriveFolderUpload, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))

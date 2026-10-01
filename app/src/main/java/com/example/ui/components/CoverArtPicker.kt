@@ -163,7 +163,7 @@ fun CoverArtPicker(
             ) {
                 OutlinedButton(
                     onClick = { imagePickerLauncher.launch("image/*") },
-                    shape = MaterialTheme.shapes.small,
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
@@ -177,14 +177,14 @@ fun CoverArtPicker(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (bitmap != null) "Change Image" else "Select Image",
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
 
                 if (bitmap != null || currentArtBytes != null) {
                     OutlinedButton(
                         onClick = onRemoveArt,
-                        shape = MaterialTheme.shapes.small,
+                        shape = MaterialTheme.shapes.medium,
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.error
                         ),
@@ -201,7 +201,7 @@ fun CoverArtPicker(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Remove Art",
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelLarge
                         )
                     }
                 }
