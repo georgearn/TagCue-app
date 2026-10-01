@@ -234,8 +234,8 @@ fun LibraryScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-            } else if (uiState.allTracks.isEmpty()) {
                 }
+            } else if (uiState.allTracks.isEmpty()) {
                 EmptyState(
                     icon = Icons.Default.DriveFolderUpload,
                     title = "No Music Loaded",
