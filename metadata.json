@@ -1,0 +1,6 @@
+{
+  "name": "TagCue",
+  "description": "Batch audio tag editor and FLAC CUE sheet splitter with live change preview engine",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
