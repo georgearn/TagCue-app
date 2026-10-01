@@ -35,6 +35,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -238,7 +240,7 @@ fun MainAppScreen(
         uiState.lastSummaryMessage?.let { summary ->
             AlertDialog(
                 onDismissRequest = { viewModel.dismissSummary() },
-                title = { Text("Notice", style = MaterialTheme.typography.titleMedium) },
+                title = { Text("Notice", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
                 text = { Text(summary, style = MaterialTheme.typography.bodyMedium) },
                 confirmButton = {
                     Button(

@@ -40,6 +40,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -62,7 +64,7 @@ fun FindReplaceDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Find & Replace in Tags", style = MaterialTheme.typography.titleMedium) },
+        title = { Text("Find & Replace in Tags", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
         text = {
             Column(
                 modifier = Modifier
@@ -173,7 +175,7 @@ fun ChangeCaseDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Change Letter Case", style = MaterialTheme.typography.titleMedium) },
+        title = { Text("Change Letter Case", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -265,7 +267,7 @@ fun AutoNumberDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Auto-Number Tracks", style = MaterialTheme.typography.titleMedium) },
+        title = { Text("Auto-Number Tracks", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -339,7 +341,7 @@ fun FilenameToTagDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Extract Tags from Filename", style = MaterialTheme.typography.titleMedium) },
+        title = { Text("Extract Tags from Filename", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -418,7 +420,7 @@ fun RenameFilesDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Rename Files from Tags", style = MaterialTheme.typography.titleMedium) },
+        title = { Text("Rename Files from Tags", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),

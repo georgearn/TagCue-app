@@ -166,7 +166,7 @@ fun CoverArtPicker(
                     shape = MaterialTheme.shapes.small,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(38.dp)
+                        .height(40.dp)
                         .testTag("btn_select_cover_image")
                 ) {
                     Icon(
@@ -190,7 +190,7 @@ fun CoverArtPicker(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(38.dp)
+                            .height(40.dp)
                             .testTag("btn_remove_cover_image")
                     ) {
                         Icon(

@@ -139,7 +139,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { showAutoNumberDialog = true },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_auto_number")
                     ) {
                         Icon(Icons.Default.Numbers, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -150,7 +150,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { showFilenameToTagDialog = true },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_filename_to_tag")
                     ) {
                         Icon(Icons.Default.AutoAwesome, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -161,7 +161,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { showRenameFilesDialog = true },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_rename_files")
                     ) {
                         Icon(Icons.Default.DriveFileRenameOutline, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -172,7 +172,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { showFindReplaceDialog = true },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_find_replace")
                     ) {
                         Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -183,7 +183,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { showChangeCaseDialog = true },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_change_case")
                     ) {
                         Icon(Icons.Default.FormatSize, contentDescription = null, modifier = Modifier.size(14.dp))
@@ -194,7 +194,7 @@ fun BatchTagEditorScreen(
                     OutlinedButton(
                         onClick = { viewModel.applyTrimSpaces() },
                         modifier = Modifier
-                            .height(34.dp)
+                            .height(40.dp)
                             .testTag("btn_tool_trim_spaces")
                     ) {
                         Icon(Icons.Default.SpaceBar, contentDescription = null, modifier = Modifier.size(14.dp))

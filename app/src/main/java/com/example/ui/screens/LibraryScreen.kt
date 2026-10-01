@@ -129,7 +129,7 @@ fun LibraryScreen(
                     if (uiState.lastBackup != null) {
                         OutlinedButton(
                             onClick = { viewModel.undoLastBatch() },
-                            modifier = Modifier.height(38.dp)
+                            modifier = Modifier.height(40.dp)
                         ) {
                             Icon(Icons.Default.Undo, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
@@ -140,7 +140,7 @@ fun LibraryScreen(
                     Button(
                         onClick = { folderPickerLauncher.launch(null) },
                         modifier = Modifier
-                            .height(38.dp)
+                            .height(40.dp)
                             .testTag("btn_select_music_folder"),
                         shape = MaterialTheme.shapes.small
                     ) {

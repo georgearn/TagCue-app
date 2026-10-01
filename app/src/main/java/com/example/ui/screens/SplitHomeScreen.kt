@@ -129,7 +129,7 @@ fun SplitHomeScreen(
                 Button(
                     onClick = { cuePicker.launch(arrayOf("*/*")) },
                     modifier = Modifier
-                        .height(44.dp)
+                        .height(48.dp)
                         .testTag("btn_empty_pick_cue"),
                     shape = MaterialTheme.shapes.medium,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -200,7 +200,7 @@ fun SplitHomeScreen(
                                 OutlinedButton(
                                     onClick = { cuePicker.launch(arrayOf("*/*")) },
                                     modifier = Modifier
-                                        .height(34.dp)
+                                        .height(40.dp)
                                         .testTag("btn_pick_cue_sheet"),
                                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
                                 ) {
@@ -234,7 +234,7 @@ fun SplitHomeScreen(
                                 Box {
                                     OutlinedButton(
                                         onClick = { encodingMenuOpen = true },
-                                        modifier = Modifier.height(30.dp),
+                                        modifier = Modifier.height(40.dp),
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                                     ) {
                                         Text("Change", style = MaterialTheme.typography.labelSmall)
@@ -306,7 +306,7 @@ fun SplitHomeScreen(
                             Button(
                                 onClick = { flacPicker.launch(arrayOf("audio/*", "application/octet-stream", "*/*")) },
                                 modifier = Modifier
-                                    .height(34.dp)
+                                    .height(40.dp)
                                     .testTag("btn_select_flac_image"),
                                 contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
                                 colors = ButtonDefaults.buttonColors(
