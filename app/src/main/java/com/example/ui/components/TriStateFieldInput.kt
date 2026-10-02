@@ -77,7 +77,7 @@ fun <T> TriStateFieldInput(
                 },
                 shape = MaterialTheme.shapes.medium
             )
-            .padding(16.dp),
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
