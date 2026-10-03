@@ -202,8 +202,8 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             val backup = withContext(Dispatchers.IO) { BackupStore.load(context) }
             if (backup != null) _uiState.update { it.copy(lastBackup = it.lastBackup ?: backup) }
         }
-        restoreSession()
-        persistSessionOnChange()
+        // Libraries are never restored across launches; drop any session saved by older versions.
+        viewModelScope.launch(Dispatchers.IO) { SessionStore.clear(getApplication<Application>()) }
         forwardProgressToNotification()
     }
 
@@ -227,91 +227,6 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             block()
         } finally {
             WorkService.end(context)
-        }
-    }
-
-    // ----------------------------------------------------
-    // SESSION PERSISTENCE (open folder + pending edits)
-    // ----------------------------------------------------
-    private fun restoreSession() {
-        val context = getApplication<Application>()
-        viewModelScope.launch {
-            val saved = withContext(Dispatchers.IO) { SessionStore.load(context) } ?: return@launch
-            val stillGranted = context.contentResolver.persistedUriPermissions.any {
-                it.isReadPermission && it.uri == saved.folderUri
-            }
-            if (!stillGranted) { withContext(Dispatchers.IO) { SessionStore.clear(context) }; return@launch }
-            if (_uiState.value.allTracks.isNotEmpty() || _uiState.value.isLoading) return@launch // user already started something
-
-            _uiState.update {
-                it.copy(
-                    isLoading = true,
-                    loadingMessage = "Restoring ${saved.folderName}...",
-                    progress = BatchProgress(0, 0, "Restoring your library...", true)
-                )
-            }
-            try {
-                val scanned = AudioTagManager.readFolderAudioFiles(context, saved.folderUri) { loaded, total, name ->
-                    _uiState.update { it.copy(progress = BatchProgress(loaded, total, "Reading tags: $name", true)) }
-                }
-                val editsByUri = saved.edits.associateBy { it.uri }
-                var restored = 0
-                val tracks = scanned.map { meta ->
-                    val base = meta.copy(folderUri = saved.folderUri, folderName = saved.folderName)
-                    val e = editsByUri[meta.uri]
-                    if (e == null || e.fileName != meta.fileName || (e.sizeBytes != 0L && e.sizeBytes != meta.sizeBytes)) {
-                        EditableTrackState(original = base, pending = base, isSelectedForApply = false)
-                    } else {
-                        restored++
-                        EditableTrackState(
-                            original = base,
-                            pending = base.copy(
-                                title = e.title, artist = e.artist, album = e.album, albumArtist = e.albumArtist,
-                                trackNumber = e.trackNumber, totalTracks = e.totalTracks, discNumber = e.discNumber,
-                                year = e.year, genre = e.genre
-                            ),
-                            isSelectedForApply = e.selected,
-                            newAlbumArtBytes = e.newArt,
-                            removeAlbumArt = e.removeArt,
-                            pendingNewFileName = e.newFileName
-                        )
-                    }
-                }
-                // A new folder may have been opened while this scan ran.
-                if (_uiState.value.allTracks.isNotEmpty()) {
-                    _uiState.update { it.copy(isLoading = false, progress = BatchProgress(isRunning = false)) }
-                    return@launch
-                }
-                _uiState.update {
-                    it.copy(
-                        loadedFolders = listOf(saved.folderUri),
-                        allTracks = tracks,
-                        isLoading = false,
-                        progress = BatchProgress(isRunning = false),
-                        lastSummaryMessage = if (restored > 0) "Restored $restored unsaved edits" else null
-                    )
-                }
-            } catch (_: Exception) {
-                _uiState.update { it.copy(isLoading = false, progress = BatchProgress(isRunning = false)) }
-            }
-        }
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun persistSessionOnChange() {
-        val context = getApplication<Application>()
-        viewModelScope.launch {
-            _uiState
-                .map { it.allTracks to it.loadedFolders }
-                .distinctUntilChanged { a, b -> a.first === b.first && a.second == b.second }
-                .debounce(1000)
-                .filter { (tracks, folders) -> folders.isNotEmpty() && tracks.isNotEmpty() }
-                .collect { (tracks, folders) ->
-                    if (_uiState.value.isLoading) return@collect
-                    val folder = folders.first()
-                    val name = tracks.firstOrNull()?.original?.folderName ?: "Music Folder"
-                    withContext(Dispatchers.IO) { SessionStore.save(context, folder, name, tracks) }
-                }
         }
     }
 
@@ -362,6 +277,18 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
     // ----------------------------------------------------
     // TAGS FLOW: 1. LIBRARY & FOLDER SCANNING
     // ----------------------------------------------------
+    fun clearLibrary() {
+        _uiState.update {
+            it.copy(
+                loadedFolders = emptyList(),
+                allTracks = emptyList(),
+                batchForm = BatchFormState(),
+                selectedFilter = ProblemFilter.ALL,
+                tagsStep = TagsStep.LIBRARY
+            )
+        }
+    }
+
     fun setProblemFilter(filter: ProblemFilter) {
         _uiState.update { it.copy(selectedFilter = filter) }
     }

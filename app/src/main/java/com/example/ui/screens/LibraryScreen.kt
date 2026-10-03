@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DriveFolderUpload
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExpandLess
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -65,6 +67,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.model.AlbumGroup
 import com.example.model.ProblemFilter
@@ -99,6 +103,21 @@ fun LibraryScreen(
         }
     }
 
+    var showClearConfirm by remember { mutableStateOf(false) }
+    if (showClearConfirm) {
+        AlertDialog(
+            onDismissRequest = { showClearConfirm = false },
+            title = { Text("Clear library?", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() }) },
+            text = { Text("Unsaved edits will be lost.", style = MaterialTheme.typography.bodyMedium) },
+            confirmButton = {
+                Button(onClick = { showClearConfirm = false; viewModel.clearLibrary() }) { Text("Clear", style = MaterialTheme.typography.labelLarge) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearConfirm = false }) { Text("Cancel", style = MaterialTheme.typography.labelLarge) }
+            }
+        )
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -126,7 +145,22 @@ fun LibraryScreen(
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    if (uiState.allTracks.isNotEmpty()) {
+                        IconButton(
+                            onClick = {
+                                if (uiState.allTracks.any { it.isModified }) showClearConfirm = true
+                                else viewModel.clearLibrary()
+                            },
+                            modifier = Modifier.testTag("btn_clear_library")
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Clear library",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
                     if (uiState.lastBackup != null) {
                         OutlinedButton(
                             onClick = { viewModel.undoLastBatch() },

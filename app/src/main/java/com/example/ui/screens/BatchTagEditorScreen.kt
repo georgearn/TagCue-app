@@ -34,6 +34,13 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +74,7 @@ fun BatchTagEditorScreen(
     var showRenameFilesDialog by remember { mutableStateOf(false) }
     var showFindReplaceDialog by remember { mutableStateOf(false) }
     var showChangeCaseDialog by remember { mutableStateOf(false) }
+    var toolsExpanded by rememberSaveable { mutableStateOf(false) }
 
     val batchForm = uiState.batchForm
 
@@ -124,14 +132,30 @@ fun BatchTagEditorScreen(
             shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(
-                    text = "QUICK TOOLS",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+            Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable(role = Role.Button) { toolsExpanded = !toolsExpanded }
+                        .testTag("btn_toggle_quick_tools"),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Quick tools",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Icon(
+                        imageVector = if (toolsExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                        contentDescription = if (toolsExpanded) "Collapse quick tools" else "Expand quick tools",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
+                AnimatedVisibility(visible = toolsExpanded) {
+                  Column {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -201,6 +225,9 @@ fun BatchTagEditorScreen(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("Trim Spaces", style = MaterialTheme.typography.labelLarge)
                     }
+                }
+                    Spacer(modifier = Modifier.height(12.dp))
+                  }
                 }
             }
         }
