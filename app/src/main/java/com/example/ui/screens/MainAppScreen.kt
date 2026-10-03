@@ -12,8 +12,6 @@ import androidx.compose.material.icons.filled.CallSplit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Style
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -23,9 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -40,6 +35,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.ui.components.FloatingNavPill
+import com.example.ui.components.NavPillItem
 import com.example.ui.components.SettingsSheet
 import com.example.ui.theme.StatTypography
 import com.example.viewmodel.AudioTaggerViewModel
@@ -121,54 +118,25 @@ fun MainAppScreen(
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ) {
-                val navItemColors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+            FloatingNavPill(
+                items = listOf(
+                    NavPillItem(
+                        label = "Tags",
+                        icon = Icons.Default.Style,
+                        selected = uiState.activeTab == MainTab.TAGS,
+                        badgeCount = uiState.selectedCount,
+                        testTag = "nav_tab_tags",
+                        onClick = { viewModel.switchTab(MainTab.TAGS) }
+                    ),
+                    NavPillItem(
+                        label = "Split",
+                        icon = Icons.Default.CallSplit,
+                        selected = uiState.activeTab == MainTab.SPLIT,
+                        testTag = "nav_tab_split",
+                        onClick = { viewModel.switchTab(MainTab.SPLIT) }
+                    )
                 )
-
-                NavigationBarItem(
-                    selected = uiState.activeTab == MainTab.TAGS,
-                    onClick = { viewModel.switchTab(MainTab.TAGS) },
-                    icon = {
-                        BadgedBox(
-                            badge = {
-                                if (uiState.selectedCount > 0) {
-                                    Badge(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    ) {
-                                        Text(
-                                            text = "${uiState.selectedCount}",
-                                            style = StatTypography.metricBadge
-                                        )
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(Icons.Default.Style, contentDescription = "Tags")
-                        }
-                    },
-                    label = { Text("Tags") },
-                    colors = navItemColors,
-                    modifier = Modifier.testTag("nav_tab_tags")
-                )
-
-                NavigationBarItem(
-                    selected = uiState.activeTab == MainTab.SPLIT,
-                    onClick = { viewModel.switchTab(MainTab.SPLIT) },
-                    icon = {
-                        Icon(Icons.Default.CallSplit, contentDescription = "Split")
-                    },
-                    label = { Text("Split") },
-                    colors = navItemColors,
-                    modifier = Modifier.testTag("nav_tab_split")
-                )
-            }
+            )
         }
     ) { innerPadding ->
         Box(
