@@ -262,8 +262,11 @@ fun LibraryScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        val msg = uiState.progress.message.ifBlank {
+                            uiState.loadingMessage.ifBlank { "Scanning music files..." }
+                        }
                         Text(
-                            text = uiState.loadingMessage.ifEmpty { "Scanning music files..." },
+                            text = msg,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

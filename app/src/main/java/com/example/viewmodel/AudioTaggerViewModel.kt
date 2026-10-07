@@ -307,8 +307,12 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             try {
                 val context = getApplication<Application>()
                 val newAudioList = AudioTagManager.readFolderAudioFiles(context, treeUri) { loaded, total, currentName ->
+                    val msg = if (total > 0) "Reading tags ($loaded/$total): $currentName" else "Reading tags: $currentName"
                     _uiState.update {
-                        it.copy(progress = BatchProgress(loaded, total, "Reading tags: $currentName", true))
+                        it.copy(
+                            loadingMessage = msg,
+                            progress = BatchProgress(loaded, total, msg, true)
+                        )
                     }
                 }
 
@@ -330,6 +334,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                         selectedFilter = ProblemFilter.ALL,
                         tagsStep = TagsStep.LIBRARY,
                         isLoading = false,
+                        loadingMessage = "",
                         progress = BatchProgress(isRunning = false),
                         lastSummaryMessage = if (newEditable.isEmpty()) {
                             "No supported audio files found in $folderName or its sub-folders."
@@ -340,6 +345,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                 _uiState.update {
                     it.copy(
                         isLoading = false,
+                        loadingMessage = "",
                         progress = BatchProgress(isRunning = false),
                         lastSummaryMessage = "Scan Error: ${e.localizedMessage ?: "Failed to read folder"}"
                     )
@@ -544,6 +550,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             _uiState.update {
                 it.copy(
                     isLoading = true,
+                    loadingMessage = "Writing tags to audio files...",
                     progress = BatchProgress(0, tracksToApply.size, "Writing tags to audio files...", true)
                 )
             }
@@ -557,9 +564,11 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
 
             for (i in tracksToApply.indices) {
                 val track = tracksToApply[i]
+                val msg = "Writing tags (${i + 1}/${tracksToApply.size}): ${track.original.fileName}"
                 _uiState.update {
                     it.copy(
-                        progress = BatchProgress(i + 1, tracksToApply.size, "Saving: ${track.original.fileName}", true)
+                        loadingMessage = msg,
+                        progress = BatchProgress(i + 1, tracksToApply.size, msg, true)
                     )
                 }
 
@@ -604,6 +613,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                     allTracks = updatedTracks,
                     lastBackup = backupWithRenames ?: it.lastBackup,
                     isLoading = false,
+                    loadingMessage = "",
                     progress = BatchProgress(isRunning = false),
                     tagsStep = TagsStep.LIBRARY,
                     lastSummaryMessage = buildString {
@@ -629,6 +639,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             _uiState.update {
                 it.copy(
                     isLoading = true,
+                    loadingMessage = "Restoring previous tags...",
                     progress = BatchProgress(0, backup.snapshot.size, "Restoring previous tags...", true)
                 )
             }
@@ -636,8 +647,18 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
             val context = getApplication<Application>()
             val updatedTracks = _uiState.value.allTracks.toMutableList()
             var restoredCount = 0
+            var step = 0
 
             for ((oldUri, originalMeta) in backup.snapshot) {
+                step++
+                val msg = "Restoring ($step/${backup.snapshot.size}): ${originalMeta.fileName}"
+                _uiState.update {
+                    it.copy(
+                        loadingMessage = msg,
+                        progress = BatchProgress(step, backup.snapshot.size, msg, true)
+                    )
+                }
+
                 // A renamed file now lives at a different uri.
                 val currentUri = backup.renames[oldUri] ?: oldUri
                 val idx = updatedTracks.indexOfFirst { it.original.uri == currentUri }
@@ -672,6 +693,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                     allTracks = updatedTracks,
                     lastBackup = null,
                     isLoading = false,
+                    loadingMessage = "",
                     progress = BatchProgress(isRunning = false),
                     lastSummaryMessage = "Undone last batch: $restoredCount files restored"
                 )
