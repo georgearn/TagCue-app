@@ -75,7 +75,14 @@ data class BatchFormState(
     val discNumAction: FieldAction<Int?> = FieldAction.Keep,
     val coverArtAction: CoverArtAction = CoverArtAction.KEEP,
     val newCoverArtBytes: ByteArray? = null
-)
+) {
+    val hasChanges: Boolean
+        get() = titleAction !is FieldAction.Keep || artistAction !is FieldAction.Keep ||
+            albumArtistAction !is FieldAction.Keep || albumAction !is FieldAction.Keep ||
+            yearAction !is FieldAction.Keep || genreAction !is FieldAction.Keep ||
+            trackNumAction !is FieldAction.Keep || totalTracksAction !is FieldAction.Keep ||
+            discNumAction !is FieldAction.Keep || coverArtAction != CoverArtAction.KEEP
+}
 
 data class BatchProgress(
     val current: Int = 0,
@@ -103,6 +110,8 @@ data class TaggerUiState(
     val loadingMessage: String = "",
     val progress: BatchProgress = BatchProgress(),
     val lastSummaryMessage: String? = null,
+    val snackbarMessage: String? = null,
+    val snackbarUndo: Boolean = false,
     // Split Feature
     val cueSheet: CueSheet? = null,
     val cueSheetUri: Uri? = null,
@@ -272,6 +281,22 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
 
     fun dismissSummary() {
         _uiState.update { it.copy(lastSummaryMessage = null) }
+    }
+
+    fun consumeSnackbar() {
+        _uiState.update { it.copy(snackbarMessage = null, snackbarUndo = false) }
+    }
+
+    fun rememberSplitOutputFolder(uri: Uri) {
+        val settings = _uiState.value.settings
+        if (settings.splitOutputUri == uri.toString()) return
+        updateSettings(settings.copy(splitOutputUri = uri.toString()))
+    }
+
+    /** Commits the batch form, then writes it straight to disk. Undo is offered afterwards. */
+    fun writeBatchDirectly() {
+        commitBatchFormToPending()
+        applyPendingChangesToDisk()
     }
 
     // ----------------------------------------------------
@@ -608,6 +633,13 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                 withContext(Dispatchers.IO) { BackupStore.save(context, backupWithRenames) }
             }
 
+            val summary = buildString {
+                append(if (errorCount == 0) "Wrote tags to $successCount files" else "Wrote $successCount files. $errorCount errors occurred.")
+                if (renamedCount > 0) append(" Renamed $renamedCount files.")
+                if (renameFailures > 0) append(" $renameFailures files could not be renamed.")
+            }
+            val clean = errorCount == 0 && renameFailures == 0
+
             _uiState.update {
                 it.copy(
                     allTracks = updatedTracks,
@@ -616,11 +648,9 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                     loadingMessage = "",
                     progress = BatchProgress(isRunning = false),
                     tagsStep = TagsStep.LIBRARY,
-                    lastSummaryMessage = buildString {
-                        append(if (errorCount == 0) "Successfully wrote tags to $successCount files" else "Wrote $successCount files. $errorCount errors occurred.")
-                        if (renamedCount > 0) append(" Renamed $renamedCount files.")
-                        if (renameFailures > 0) append(" $renameFailures files could not be renamed.")
-                    }
+                    lastSummaryMessage = if (clean) null else summary,
+                    snackbarMessage = if (clean) summary else null,
+                    snackbarUndo = clean && (backupWithRenames ?: it.lastBackup) != null
                 )
             }
         }
@@ -695,7 +725,7 @@ class AudioTaggerViewModel(application: Application) : AndroidViewModel(applicat
                     isLoading = false,
                     loadingMessage = "",
                     progress = BatchProgress(isRunning = false),
-                    lastSummaryMessage = "Undone last batch: $restoredCount files restored"
+                    snackbarMessage = "Undone: $restoredCount files restored"
                 )
             }
         }

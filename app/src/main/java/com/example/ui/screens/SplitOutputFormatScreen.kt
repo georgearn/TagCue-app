@@ -43,6 +43,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.remember
+import androidx.compose.material3.TextButton
+import androidx.documentfile.provider.DocumentFile
+import androidx.compose.ui.platform.LocalContext
+import android.net.Uri
 import com.example.model.TrackNumberStyle
 import com.example.ui.theme.StatTypography
 import com.example.viewmodel.AudioTaggerViewModel
@@ -56,12 +61,32 @@ fun SplitOutputFormatScreen(
     viewModel: AudioTaggerViewModel,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val outputFolderPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
     ) { treeUri ->
         if (treeUri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(
+                    treeUri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                            android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            }
+            viewModel.rememberSplitOutputFolder(treeUri)
             viewModel.executeFlacSplit(treeUri)
         }
+    }
+
+    // Reuse the last output folder while its write grant is still valid.
+    val rememberedFolder = remember(uiState.settings.splitOutputUri) {
+        uiState.settings.splitOutputUri?.let { Uri.parse(it) }?.takeIf { saved ->
+            context.contentResolver.persistedUriPermissions.any { it.uri == saved && it.isWritePermission } &&
+                DocumentFile.fromTreeUri(context, saved)?.canWrite() == true
+        }
+    }
+    val rememberedName = remember(rememberedFolder) {
+        rememberedFolder?.let { DocumentFile.fromTreeUri(context, it)?.name }
     }
 
     val config = uiState.splitConfig
@@ -301,18 +326,47 @@ fun SplitOutputFormatScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Button(
-                    onClick = { outputFolderPicker.launch(null) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .testTag("btn_choose_output_and_split"),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.labelLarge)
+                if (rememberedFolder != null) {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Button(
+                            onClick = { viewModel.executeFlacSplit(rememberedFolder) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .testTag("btn_split_to_remembered"),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Split to ${rememberedName ?: "last folder"}",
+                                style = MaterialTheme.typography.labelLarge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        TextButton(
+                            onClick = { outputFolderPicker.launch(null) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("btn_choose_output_and_split")
+                        ) {
+                            Text("Choose another folder", style = MaterialTheme.typography.labelLarge)
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = { outputFolderPicker.launch(null) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .testTag("btn_choose_output_and_split"),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

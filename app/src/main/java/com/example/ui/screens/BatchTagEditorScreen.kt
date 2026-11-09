@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.FormatSize
 import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SpaceBar
 import androidx.compose.material3.Button
@@ -369,19 +370,39 @@ fun BatchTagEditorScreen(
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = {
-                        viewModel.commitBatchFormToPending()
-                        viewModel.setTagsStep(TagsStep.REVIEW_CHANGES)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .testTag("btn_review_changes"),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                val canWrite = batchForm.hasChanges || uiState.selectedTracks.any { it.isModified }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text("Review Changes", style = MaterialTheme.typography.labelLarge)
+                    OutlinedButton(
+                        onClick = {
+                            viewModel.commitBatchFormToPending()
+                            viewModel.setTagsStep(TagsStep.REVIEW_CHANGES)
+                        },
+                        enabled = canWrite,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .testTag("btn_review_changes"),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Text("Review", style = MaterialTheme.typography.labelLarge)
+                    }
+
+                    Button(
+                        onClick = { viewModel.writeBatchDirectly() },
+                        enabled = canWrite,
+                        modifier = Modifier
+                            .weight(1.6f)
+                            .height(48.dp)
+                            .testTag("btn_write_tags_direct"),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Write ${uiState.selectedCount} files", style = MaterialTheme.typography.labelLarge)
+                    }
                 }
             }
         }

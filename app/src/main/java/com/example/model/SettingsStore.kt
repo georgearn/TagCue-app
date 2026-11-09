@@ -20,7 +20,8 @@ object SettingsStore {
             autoTrimSpaces = p.getBoolean("trim", d.autoTrimSpaces),
             useMaterial3Dynamic = p.getBoolean("dynamic", d.useMaterial3Dynamic),
             darkTheme = p.getBoolean("dark", d.darkTheme),
-            musicRootUri = p.getString("musicRootUri", null)
+            musicRootUri = p.getString("musicRootUri", null),
+            splitOutputUri = p.getString("splitOutputUri", null)
         )
     }
 
@@ -35,6 +36,7 @@ object SettingsStore {
             .putBoolean("dynamic", s.useMaterial3Dynamic)
             .putBoolean("dark", s.darkTheme)
             .putString("musicRootUri", s.musicRootUri)
+            .putString("splitOutputUri", s.splitOutputUri)
             .apply()
     }
 }

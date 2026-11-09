@@ -9,5 +9,6 @@ data class AppSettings(
     val autoTrimSpaces: Boolean = true,
     val useMaterial3Dynamic: Boolean = false,
     val darkTheme: Boolean = true,
-    val musicRootUri: String? = null
+    val musicRootUri: String? = null,
+    val splitOutputUri: String? = null
 )
