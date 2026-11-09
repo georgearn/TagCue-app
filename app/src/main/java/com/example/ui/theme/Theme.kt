@@ -16,6 +16,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
@@ -31,6 +32,13 @@ data class StatusColors(
     val selectedStrong: Color,
     val selectedBorder: Color
 )
+
+val LocalCompact = staticCompositionLocalOf { false }
+
+val MaterialTheme.isCompact: Boolean
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalCompact.current
 
 private val LocalStatusColors = staticCompositionLocalOf {
     statusColors(StudioDarkColorScheme, dark = true)
@@ -149,11 +157,13 @@ fun TagCueTheme(
         statusColors(colorScheme, darkTheme)
     }
 
-    CompositionLocalProvider(LocalStatusColors provides status) {
+    val compact = LocalConfiguration.current.screenHeightDp < 700
+
+    CompositionLocalProvider(LocalStatusColors provides status, LocalCompact provides compact) {
         MaterialTheme(
             colorScheme = colorScheme,
             shapes = TagCueShapes,
-            typography = Typography,
+            typography = if (compact) Typography.compact() else Typography,
             content = content
         )
     }

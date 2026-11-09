@@ -73,7 +73,7 @@ fun ReviewChangesScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Top Header
         Row(
@@ -114,7 +114,7 @@ fun ReviewChangesScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Tracks Diff List
         if (uiState.modifiedSelectedTracks.isEmpty()) {
@@ -150,9 +150,9 @@ fun ReviewChangesScreen(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface
         ) {
-            Column(modifier = Modifier.padding(vertical = 12.dp)) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

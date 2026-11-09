@@ -5,6 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -98,15 +100,15 @@ fun SplitHomeScreen(
             // CUE sheet loaded
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 88.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 // Header
                 item {
                     Column {
                         Text(
                             text = "FLAC CUE Splitter",
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(2.dp))
@@ -126,7 +128,7 @@ fun SplitHomeScreen(
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column(modifier = Modifier.padding(12.dp)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -227,7 +229,7 @@ fun SplitHomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(12.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -320,7 +322,7 @@ fun SplitHomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     val canContinue = uiState.pairedFlacUri != null && cueSheet.tracks.any { it.isSelectedForSplit }
                     Button(
@@ -352,6 +354,7 @@ fun InlineCueTrackCard(
 ) {
     var titleText by remember(track.title) { mutableStateOf(track.title) }
     var performerText by remember(track.performer) { mutableStateOf(track.performer) }
+    var editPerformer by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -362,18 +365,15 @@ fun InlineCueTrackCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(horizontal = 4.dp, vertical = 6.dp),
             verticalAlignment = Alignment.Top
         ) {
             Checkbox(
                 checked = track.isSelectedForSplit,
                 onCheckedChange = { onToggle() },
-                modifier = Modifier
-                    .size(24.dp)
-                    .testTag("cb_cue_track_${track.number}")
+                modifier = Modifier.testTag("cb_cue_track_${track.number}")
             )
-            Spacer(modifier = Modifier.width(10.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -390,32 +390,50 @@ fun InlineCueTrackCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = titleText,
                     onValueChange = {
                         titleText = it
                         onUpdate(it, performerText)
                     },
-                    label = { Text("Title") },
+                    placeholder = { Text("Title") },
+                    textStyle = MaterialTheme.typography.bodyMedium,
                     singleLine = true,
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("input_cue_title_${track.number}")
                 )
-                Spacer(modifier = Modifier.height(6.dp))
-                OutlinedTextField(
-                    value = performerText,
-                    onValueChange = {
-                        performerText = it
-                        onUpdate(titleText, it)
-                    },
-                    label = { Text("Performer / Artist") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("input_cue_performer_${track.number}")
-                )
+                if (editPerformer || performerText.isBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    OutlinedTextField(
+                        value = performerText,
+                        onValueChange = {
+                            performerText = it
+                            onUpdate(titleText, it)
+                        },
+                        placeholder = { Text("Performer / Artist") },
+                        textStyle = MaterialTheme.typography.bodyMedium,
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("input_cue_performer_${track.number}")
+                    )
+                } else {
+                    Text(
+                        text = performerText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 32.dp)
+                            .clickable { editPerformer = true }
+                            .padding(top = 6.dp)
+                            .testTag("text_cue_performer_${track.number}")
+                    )
+                }
             }
         }
     }

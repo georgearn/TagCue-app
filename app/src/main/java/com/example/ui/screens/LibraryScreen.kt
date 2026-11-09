@@ -12,6 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -124,7 +127,7 @@ fun LibraryScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Header & Folder Controls
             Row(
@@ -132,112 +135,92 @@ fun LibraryScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
-                        text = "Music Library",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Text(
-                        text = "${uiState.allTracks.size} tracks • ${uiState.albumGroups.size} albums",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = "Music Library",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.semantics { heading() }
+                )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (uiState.allTracks.isNotEmpty()) {
-                        IconButton(
-                            onClick = {
-                                if (uiState.allTracks.any { it.isModified }) showClearConfirm = true
-                                else viewModel.clearLibrary()
-                            },
-                            modifier = Modifier.testTag("btn_clear_library")
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Clear library",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                if (uiState.allTracks.isNotEmpty() || uiState.lastBackup != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (uiState.lastBackup != null) {
+                            IconButton(
+                                onClick = { viewModel.undoLastBatch() },
+                                modifier = Modifier.testTag("btn_undo_batch")
+                            ) {
+                                Icon(
+                                    Icons.Default.Undo,
+                                    contentDescription = "Undo last batch",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
-                    }
-                    if (uiState.lastBackup != null) {
-                        OutlinedButton(
-                            onClick = { viewModel.undoLastBatch() },
-                            modifier = Modifier.height(40.dp)
-                        ) {
-                            Icon(Icons.Default.Undo, contentDescription = null, modifier = Modifier.size(16.dp))
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("Undo", style = MaterialTheme.typography.labelLarge)
+                        if (uiState.allTracks.isNotEmpty()) {
+                            IconButton(
+                                onClick = { folderPickerLauncher.launch(null) },
+                                modifier = Modifier.testTag("btn_select_music_folder")
+                            ) {
+                                Icon(
+                                    Icons.Default.DriveFolderUpload,
+                                    contentDescription = "Change folder",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (uiState.allTracks.any { it.isModified }) showClearConfirm = true
+                                    else viewModel.clearLibrary()
+                                },
+                                modifier = Modifier.testTag("btn_clear_library")
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Clear library",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
-                    }
-
-                    Button(
-                        onClick = { folderPickerLauncher.launch(null) },
-                        modifier = Modifier
-                            .height(40.dp)
-                            .testTag("btn_select_music_folder"),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Icon(Icons.Default.DriveFolderUpload, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = if (uiState.allTracks.isEmpty()) "Open Folder" else "Change Folder",
-                            style = MaterialTheme.typography.labelLarge
-                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Problem Filter Chips
             if (uiState.allTracks.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    Text(
+                        text = "${uiState.allTracks.size} tracks • ${uiState.albumGroups.size} albums",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    TextButton(
+                        onClick = { viewModel.selectAll(!uiState.isAllSelected) },
+                        modifier = Modifier
+                            .heightIn(min = 32.dp)
+                            .testTag("btn_select_all"),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                     ) {
-                        Icon(
-                            Icons.Default.FilterList,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(18.dp)
-                        )
                         Text(
-                            "Filter Problems:",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            if (uiState.isAllSelected) "Deselect all" else "Select all",
+                            style = MaterialTheme.typography.labelLarge
                         )
-                    }
-
-                    Row {
-                        TextButton(
-                            onClick = { viewModel.selectAll(!uiState.isAllSelected) },
-                            modifier = Modifier.testTag("btn_select_all")
-                        ) {
-                            Text(
-                                if (uiState.isAllSelected) "Deselect All" else "Select All",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        }
                     }
                 }
 
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     ProblemFilter.values().forEach { filter ->
                         FilterChip(
                             selected = uiState.selectedFilter == filter,
                             onClick = { viewModel.setProblemFilter(filter) },
-                            label = { Text(filter.displayName, style = MaterialTheme.typography.bodySmall) },
+                            label = { Text(filter.displayName, style = MaterialTheme.typography.labelMedium) },
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.status.selectedStrong,
                                 selectedLabelColor = MaterialTheme.colorScheme.primary
@@ -246,7 +229,7 @@ fun LibraryScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
             // Main List or Empty State
@@ -286,8 +269,8 @@ fun LibraryScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 72.dp)
                 ) {
                     items(uiState.albumGroups, key = { it.albumKey }) { album ->
                         AlbumGroupCard(
@@ -307,7 +290,7 @@ fun LibraryScreen(
             exit = fadeOut(),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(20.dp)
+                .padding(12.dp)
         ) {
             ExtendedFloatingActionButton(
                 onClick = { viewModel.setTagsStep(TagsStep.BATCH_EDITOR) },
@@ -375,7 +358,7 @@ fun AlbumGroupCard(
             }
         )
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -390,7 +373,7 @@ fun AlbumGroupCard(
                 // Cover preview or music note
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(40.dp)
                         .clip(MaterialTheme.shapes.small)
                         .background(MaterialTheme.colorScheme.surfaceVariant),
                     contentAlignment = Alignment.Center
@@ -412,7 +395,7 @@ fun AlbumGroupCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 Column(
                     modifier = Modifier

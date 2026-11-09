@@ -14,9 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -38,14 +42,22 @@ data class NavPillItem(
     val onClick: () -> Unit
 )
 
+private val BarHeight = 46.dp
+
+/** Floating tab pill with a separate round settings button beside it. */
 @Composable
-fun FloatingNavPill(items: List<NavPillItem>, modifier: Modifier = Modifier) {
-    Box(
+fun FloatingNavPill(
+    items: List<NavPillItem>,
+    onSettingsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(bottom = 8.dp, top = 4.dp),
-        contentAlignment = Alignment.Center
+            .padding(bottom = 6.dp, top = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Surface(
             shape = CircleShape,
@@ -54,8 +66,8 @@ fun FloatingNavPill(items: List<NavPillItem>, modifier: Modifier = Modifier) {
             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
         ) {
             Row(
-                modifier = Modifier.padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                modifier = Modifier.padding(3.dp),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 items.forEach { item ->
@@ -63,11 +75,11 @@ fun FloatingNavPill(items: List<NavPillItem>, modifier: Modifier = Modifier) {
                     else MaterialTheme.colorScheme.onSurfaceVariant
                     Row(
                         modifier = Modifier
-                            .heightIn(min = 48.dp)
+                            .heightIn(min = BarHeight - 6.dp)
                             .clip(CircleShape)
-                            .background(if (item.selected) MaterialTheme.colorScheme.primaryContainer else androidx.compose.ui.graphics.Color.Transparent)
+                            .background(if (item.selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
                             .selectable(selected = item.selected, role = Role.Tab, onClick = item.onClick)
-                            .padding(horizontal = 20.dp)
+                            .padding(horizontal = 16.dp)
                             .testTag(item.testTag),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -80,11 +92,34 @@ fun FloatingNavPill(items: List<NavPillItem>, modifier: Modifier = Modifier) {
                                 }
                             }
                         ) {
-                            Icon(item.icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(20.dp))
+                            Icon(item.icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(18.dp))
                         }
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(item.label, style = MaterialTheme.typography.labelLarge, color = contentColor)
                     }
+                }
+            }
+        }
+
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            shadowElevation = 6.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                IconButton(
+                    onClick = onSettingsClick,
+                    modifier = Modifier
+                        .size(BarHeight)
+                        .testTag("btn_top_settings")
+                ) {
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }

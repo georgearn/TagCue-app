@@ -83,7 +83,7 @@ fun BatchTagEditorScreen(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Top Header
         Row(
@@ -124,7 +124,7 @@ fun BatchTagEditorScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Quick Batch Operations Toolbar
         Card(
@@ -226,20 +226,20 @@ fun BatchTagEditorScreen(
                         Text("Trim Spaces", style = MaterialTheme.typography.labelLarge)
                     }
                 }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                   }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // Form Fields (Scrollable)
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Cover Art
             CoverArtPicker(
@@ -365,9 +365,9 @@ fun BatchTagEditorScreen(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface
         ) {
-            Column(modifier = Modifier.padding(vertical = 12.dp)) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = {

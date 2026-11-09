@@ -66,6 +66,19 @@ val Typography = Typography(
     )
 )
 
+/** Tighter scale for short screens (e.g. 9:16 DAPs, about 640dp tall). */
+fun Typography.compact(): Typography = copy(
+    titleLarge = titleLarge.copy(fontSize = 18.sp, lineHeight = 24.sp),
+    titleMedium = titleMedium.copy(fontSize = 15.sp, lineHeight = 20.sp),
+    titleSmall = titleSmall.copy(fontSize = 13.sp, lineHeight = 18.sp),
+    bodyLarge = bodyLarge.copy(fontSize = 14.sp, lineHeight = 20.sp),
+    bodyMedium = bodyMedium.copy(fontSize = 13.sp, lineHeight = 18.sp),
+    bodySmall = bodySmall.copy(fontSize = 11.sp, lineHeight = 15.sp),
+    labelLarge = labelLarge.copy(fontSize = 13.sp, lineHeight = 18.sp),
+    labelMedium = labelMedium.copy(fontSize = 11.sp, lineHeight = 14.sp),
+    labelSmall = labelSmall.copy(fontSize = 11.sp, lineHeight = 14.sp)
+)
+
 object StatTypography {
     val metricLarge = TextStyle(
         fontFamily = NumberFontFamily,

@@ -76,54 +76,9 @@ fun MainAppScreen(
 
     Scaffold(
         modifier = modifier,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = "TagCue",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        val subtitle = when (uiState.activeTab) {
-                            MainTab.TAGS -> when (uiState.tagsStep) {
-                                TagsStep.LIBRARY -> "Music Library"
-                                TagsStep.BATCH_EDITOR -> "Batch Tag Editor"
-                                TagsStep.REVIEW_CHANGES -> "Review Changes"
-                            }
-                            MainTab.SPLIT -> when (uiState.splitStep) {
-                                SplitStep.SPLIT_HOME -> "CUE Splitter"
-                                SplitStep.OUTPUT_FORMAT -> "Output Format & Preview"
-                                SplitStep.SPLIT_PROGRESS,
-                                SplitStep.SPLIT_DONE -> "Split Status"
-                            }
-                        }
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.toggleSettingsDialog(true) },
-                        modifier = Modifier.testTag("btn_top_settings")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
         bottomBar = {
             FloatingNavPill(
+                onSettingsClick = { viewModel.toggleSettingsDialog(true) },
                 items = listOf(
                     NavPillItem(
                         label = "Tags",
