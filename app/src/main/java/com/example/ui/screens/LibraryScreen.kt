@@ -73,6 +73,8 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.example.ui.theme.Dimens
+import com.example.ui.components.ScreenHeader
 import com.example.model.AlbumGroup
 import com.example.model.ProblemFilter
 import com.example.ui.components.EmptyState
@@ -122,69 +124,56 @@ fun LibraryScreen(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
+        Column(modifier = Modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = "Select tracks",
+            subtitle = if (uiState.allTracks.isEmpty()) "Open a music folder to begin" else "Tick albums or tracks to edit",
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Header & Folder Controls
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Music Library",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.semantics { heading() }
-                )
-
-                if (uiState.allTracks.isNotEmpty() || uiState.lastBackup != null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        if (uiState.lastBackup != null) {
-                            IconButton(
-                                onClick = { viewModel.undoLastBatch() },
-                                modifier = Modifier.testTag("btn_undo_batch")
-                            ) {
-                                Icon(
-                                    Icons.Default.Undo,
-                                    contentDescription = "Undo last batch",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                        if (uiState.allTracks.isNotEmpty()) {
-                            IconButton(
-                                onClick = { folderPickerLauncher.launch(null) },
-                                modifier = Modifier.testTag("btn_select_music_folder")
-                            ) {
-                                Icon(
-                                    Icons.Default.DriveFolderUpload,
-                                    contentDescription = "Change folder",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    if (uiState.allTracks.any { it.isModified }) showClearConfirm = true
-                                    else viewModel.clearLibrary()
-                                },
-                                modifier = Modifier.testTag("btn_clear_library")
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = "Clear library",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        }
-                    }
+            if (uiState.lastBackup != null) {
+                IconButton(
+                    onClick = { viewModel.undoLastBatch() },
+                    modifier = Modifier.testTag("btn_undo_batch")
+                ) {
+                    Icon(
+                        Icons.Default.Undo,
+                        contentDescription = "Undo last batch",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
+            if (uiState.allTracks.isNotEmpty()) {
+                IconButton(
+                    onClick = { folderPickerLauncher.launch(null) },
+                    modifier = Modifier.testTag("btn_select_music_folder")
+                ) {
+                    Icon(
+                        Icons.Default.DriveFolderUpload,
+                        contentDescription = "Change folder",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+                IconButton(
+                    onClick = {
+                        if (uiState.allTracks.any { it.isModified }) showClearConfirm = true
+                        else viewModel.clearLibrary()
+                    },
+                    modifier = Modifier.testTag("btn_clear_library")
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Clear library",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
 
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = Dimens.ScreenPadding)
+        ) {
             if (uiState.allTracks.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -269,8 +258,8 @@ fun LibraryScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(bottom = 72.dp)
+                    verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
+                    contentPadding = PaddingValues(bottom = Dimens.ListBottomInset)
                 ) {
                     items(uiState.albumGroups, key = { it.albumKey }) { album ->
                         AlbumGroupCard(
@@ -281,6 +270,7 @@ fun LibraryScreen(
                     }
                 }
             }
+        }
         }
 
         // FAB for batch tag editor

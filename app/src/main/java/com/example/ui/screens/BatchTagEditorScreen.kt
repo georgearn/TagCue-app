@@ -50,6 +50,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.example.ui.theme.Dimens
+import com.example.ui.components.StickyActionBar
+import com.example.ui.components.ScreenHeader
 import com.example.model.CoverArtAction
 import com.example.ui.components.AutoNumberDialog
 import com.example.ui.components.ChangeCaseDialog
@@ -79,54 +82,19 @@ fun BatchTagEditorScreen(
 
     val batchForm = uiState.batchForm
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
+    Column(modifier = modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = "Edit tags",
+            subtitle = "${uiState.selectedCount} tracks selected",
+            onBack = { viewModel.setTagsStep(TagsStep.LIBRARY) },
+            backTestTag = "btn_back_to_library"
+        )
 
-        // Top Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = Dimens.ScreenPadding)
         ) {
-            IconButton(
-                onClick = { viewModel.setTagsStep(TagsStep.LIBRARY) },
-                modifier = Modifier.testTag("btn_back_to_library")
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.width(4.dp))
-
-            Column {
-                Text(
-                    text = "Batch Tag Editor",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${uiState.selectedCount}",
-                        style = StatTypography.metricBadge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = " tracks selected for batch update",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Quick Batch Operations Toolbar
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -361,48 +329,41 @@ fun BatchTagEditorScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // Bottom Sticky Action Bar
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface
-        ) {
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(8.dp))
+        }
 
-                val canWrite = batchForm.hasChanges || uiState.selectedTracks.any { it.isModified }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+        StickyActionBar {
+            val canWrite = batchForm.hasChanges || uiState.selectedTracks.any { it.isModified }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.commitBatchFormToPending()
+                        viewModel.setTagsStep(TagsStep.REVIEW_CHANGES)
+                    },
+                    enabled = canWrite,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_review_changes"),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.commitBatchFormToPending()
-                            viewModel.setTagsStep(TagsStep.REVIEW_CHANGES)
-                        },
-                        enabled = canWrite,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .testTag("btn_review_changes"),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text("Review", style = MaterialTheme.typography.labelLarge)
-                    }
+                    Text("Review", style = MaterialTheme.typography.labelLarge)
+                }
 
-                    Button(
-                        onClick = { viewModel.writeBatchDirectly() },
-                        enabled = canWrite,
-                        modifier = Modifier
-                            .weight(1.6f)
-                            .height(48.dp)
-                            .testTag("btn_write_tags_direct"),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Write ${uiState.selectedCount} files", style = MaterialTheme.typography.labelLarge)
-                    }
+                Button(
+                    onClick = { viewModel.writeBatchDirectly() },
+                    enabled = canWrite,
+                    modifier = Modifier
+                        .weight(1.6f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_write_tags_direct"),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Write ${uiState.selectedCount} files", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }

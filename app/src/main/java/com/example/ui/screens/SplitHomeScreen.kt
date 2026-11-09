@@ -49,6 +49,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.ui.theme.Dimens
+import com.example.ui.components.StickyActionBar
+import com.example.ui.components.ScreenHeader
+import com.example.ui.components.AppCard
 import com.example.model.CueEncoding
 import com.example.model.CueSheet
 import com.example.model.CueTrack
@@ -82,14 +86,19 @@ fun SplitHomeScreen(
 
     var encodingMenuOpen by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
+    ScreenHeader(
+        title = "Split FLAC",
+        subtitle = if (uiState.cueSheet == null) "Pick a CUE sheet to begin" else "CUE sheet + FLAC image, lossless split"
+    )
+    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
         val cueSheet = uiState.cueSheet
 
         if (cueSheet == null) {
             // Empty State
             EmptyState(
                 icon = Icons.Default.CallSplit,
-                title = "Split FLAC by CUE Sheet",
+                title = "Load a CUE sheet",
                 description = "Select a .cue sheet from local storage. The app parses tracks immediately, fixes non-Unicode/Cyrillic encodings, and splits lossless FLAC tracks.",
                 actionLabel = "Select .cue File",
                 actionIcon = Icons.Default.FileOpen,
@@ -100,34 +109,12 @@ fun SplitHomeScreen(
             // CUE sheet loaded
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, top = Dimens.ItemSpacing, bottom = Dimens.ListBottomInset),
+                verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing)
             ) {
-                // Header
-                item {
-                    Column {
-                        Text(
-                            text = "FLAC CUE Splitter",
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "Pick .cue sheet + FLAC image • Lossless audio split",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-
                 // CUE Card
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
+                    AppCard {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -220,12 +207,7 @@ fun SplitHomeScreen(
                 // Paired FLAC Card
                 item {
                     val pairedFlac = uiState.pairedFlacMetadata
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
+                    AppCard {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -312,36 +294,25 @@ fun SplitHomeScreen(
             }
 
             // Bottom Sticky Bar
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shadowElevation = 8.dp
-            ) {
-                Box(
+            StickyActionBar(modifier = Modifier.align(Alignment.BottomCenter)) {
+                val canContinue = uiState.pairedFlacUri != null && cueSheet.tracks.any { it.isSelectedForSplit }
+                Button(
+                    onClick = { viewModel.setSplitStep(SplitStep.OUTPUT_FORMAT) },
+                    enabled = canContinue,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_continue_to_output_format"),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    val canContinue = uiState.pairedFlacUri != null && cueSheet.tracks.any { it.isSelectedForSplit }
-                    Button(
-                        onClick = { viewModel.setSplitStep(SplitStep.OUTPUT_FORMAT) },
-                        enabled = canContinue,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .testTag("btn_continue_to_output_format"),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Text("Configure Output Format", style = MaterialTheme.typography.labelLarge)
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
-                    }
+                    Text("Configure Output Format", style = MaterialTheme.typography.labelLarge)
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                 }
             }
         }
+    }
     }
 }
 
@@ -356,12 +327,7 @@ fun InlineCueTrackCard(
     var performerText by remember(track.performer) { mutableStateOf(track.performer) }
     var editPerformer by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-    ) {
+    AppCard(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()

@@ -47,6 +47,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.ui.theme.Dimens
+import com.example.ui.components.StickyActionBar
+import com.example.ui.components.ScreenHeader
 import com.example.model.EditableTrackState
 import com.example.ui.theme.StatTypography
 import com.example.ui.theme.status
@@ -68,54 +71,19 @@ fun ReviewChangesScreen(
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        Spacer(modifier = Modifier.height(8.dp))
+    Column(modifier = modifier.fillMaxSize()) {
+        ScreenHeader(
+            title = "Review changes",
+            subtitle = "${uiState.modifiedSelectedTracks.size} files to update",
+            onBack = { viewModel.setTagsStep(TagsStep.BATCH_EDITOR) },
+            backTestTag = "btn_back_to_editor"
+        )
 
-        // Top Header
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = Dimens.ScreenPadding)
         ) {
-            IconButton(
-                onClick = { viewModel.setTagsStep(TagsStep.BATCH_EDITOR) },
-                modifier = Modifier.testTag("btn_back_to_editor")
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.width(4.dp))
-
-            Column {
-                Text(
-                    text = "Review Changes",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${uiState.modifiedSelectedTracks.size}",
-                        style = StatTypography.metricBadge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = " files to update • Inspect diffs before saving",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
         // Tracks Diff List
         if (uiState.modifiedSelectedTracks.isEmpty()) {
             Box(
@@ -133,8 +101,8 @@ fun ReviewChangesScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing),
+                contentPadding = PaddingValues(bottom = Dimens.ScreenPadding)
             ) {
                 items(uiState.modifiedSelectedTracks, key = { it.original.uri }) { track ->
                     ReviewDiffItemCard(
@@ -145,47 +113,40 @@ fun ReviewChangesScreen(
             }
         }
 
-        // Bottom Sticky Action Bar
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface
-        ) {
-            Column(modifier = Modifier.padding(vertical = 8.dp)) {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                Spacer(modifier = Modifier.height(8.dp))
+        }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+        StickyActionBar {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        viewModel.revertAllPending()
+                        viewModel.setTagsStep(TagsStep.BATCH_EDITOR)
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_discard_changes"),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            viewModel.revertAllPending()
-                            viewModel.setTagsStep(TagsStep.BATCH_EDITOR)
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .testTag("btn_discard_changes"),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Text("Discard", style = MaterialTheme.typography.labelLarge)
-                    }
+                    Text("Discard", style = MaterialTheme.typography.labelLarge)
+                }
 
-                    Button(
-                        onClick = { showConfirmDialog = true },
-                        enabled = uiState.modifiedSelectedTracks.isNotEmpty(),
-                        modifier = Modifier
-                            .weight(1.5f)
-                            .height(48.dp)
-                            .testTag("btn_confirm_write_tags"),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Write Tags to Files", style = MaterialTheme.typography.labelLarge)
-                    }
+                Button(
+                    onClick = { showConfirmDialog = true },
+                    enabled = uiState.modifiedSelectedTracks.isNotEmpty(),
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_confirm_write_tags"),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Write Tags to Files", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }

@@ -39,6 +39,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.ui.theme.Dimens
+import com.example.ui.components.StickyActionBar
+import com.example.ui.components.ScreenHeader
+import com.example.ui.components.AppCard
 import com.example.ui.theme.StatTypography
 import com.example.viewmodel.AudioTaggerViewModel
 import com.example.viewmodel.SplitStep
@@ -53,7 +57,12 @@ fun SplitProgressDoneScreen(
     val progress = uiState.splitProgress
     val isRunning = progress.isRunning
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
+    ScreenHeader(
+        title = if (isRunning) "Splitting" else "Split complete",
+        subtitle = if (isRunning) "Keep the app open until it finishes" else "${uiState.splitGeneratedFiles.size} tracks created"
+    )
+    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
         if (isRunning) {
             // Running Progress View
             Column(
@@ -112,57 +121,9 @@ fun SplitProgressDoneScreen(
             // Completed View
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, top = Dimens.ItemSpacing, bottom = Dimens.ListBottomInset),
+                verticalArrangement = Arrangement.spacedBy(Dimens.ItemSpacing)
             ) {
-                // Done Header Card
-                item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Surface(
-                                modifier = Modifier.size(64.dp),
-                                shape = MaterialTheme.shapes.large,
-                                color = MaterialTheme.colorScheme.primaryContainer
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(36.dp)
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            Text(
-                                text = "Splitting Complete!",
-                                style = MaterialTheme.typography.titleLarge,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-                            Text(
-                                text = "${uiState.splitGeneratedFiles.size} tracks created • Lossless FLAC",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-
                 // Generated Files list header
                 item {
                     Text(
@@ -174,12 +135,7 @@ fun SplitProgressDoneScreen(
                 }
 
                 items(uiState.splitGeneratedFiles) { fileName ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.small,
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                    ) {
+                    AppCard(shape = MaterialTheme.shapes.small) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -213,47 +169,42 @@ fun SplitProgressDoneScreen(
             }
 
             // Bottom Sticky Bar
-            Surface(
+            StickyActionBar(modifier = Modifier.align(Alignment.BottomCenter)) {
+            Row(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shadowElevation = 8.dp
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Row(
+                OutlinedButton(
+                    onClick = { viewModel.setSplitStep(SplitStep.SPLIT_HOME) },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        .weight(1f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_split_another_cue"),
+                    shape = MaterialTheme.shapes.medium
                 ) {
-                    OutlinedButton(
-                        onClick = { viewModel.setSplitStep(SplitStep.SPLIT_HOME) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .testTag("btn_split_another_cue"),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Split Another", style = MaterialTheme.typography.labelLarge)
-                    }
+                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Split Another", style = MaterialTheme.typography.labelLarge)
+                }
 
-                    Button(
-                        onClick = { viewModel.openSplitFilesIntoTagEditor() },
-                        modifier = Modifier
-                            .weight(1.3f)
-                            .height(48.dp)
-                            .testTag("btn_open_split_in_tag_editor"),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text("Open in Tag Editor", style = MaterialTheme.typography.labelLarge)
-                    }
+                Button(
+                    onClick = { viewModel.openSplitFilesIntoTagEditor() },
+                    modifier = Modifier
+                        .weight(1.3f)
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_open_split_in_tag_editor"),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Open in Tag Editor", style = MaterialTheme.typography.labelLarge)
                 }
             }
+            }
         }
+    }
     }
 }

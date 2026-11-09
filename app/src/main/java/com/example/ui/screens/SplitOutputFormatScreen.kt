@@ -48,6 +48,10 @@ import androidx.compose.material3.TextButton
 import androidx.documentfile.provider.DocumentFile
 import androidx.compose.ui.platform.LocalContext
 import android.net.Uri
+import com.example.ui.theme.Dimens
+import com.example.ui.components.StickyActionBar
+import com.example.ui.components.ScreenHeader
+import com.example.ui.components.AppCard
 import com.example.model.TrackNumberStyle
 import com.example.ui.theme.StatTypography
 import com.example.viewmodel.AudioTaggerViewModel
@@ -91,51 +95,21 @@ fun SplitOutputFormatScreen(
 
     val config = uiState.splitConfig
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
+    ScreenHeader(
+        title = "Output format",
+        subtitle = "Set names, then check the preview",
+        onBack = { viewModel.setSplitStep(SplitStep.SPLIT_HOME) }
+    )
+    Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            contentPadding = PaddingValues(start = Dimens.ScreenPadding, end = Dimens.ScreenPadding, top = Dimens.ItemSpacing, bottom = Dimens.ListBottomInset),
+            verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing)
         ) {
-            // Header with Back button
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    IconButton(
-                        onClick = { viewModel.setSplitStep(SplitStep.SPLIT_HOME) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Column {
-                        Text(
-                            text = "Output Format & Live Preview",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text(
-                            text = "Customize templates and preview exact filenames, folders, and tags",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
             // Configuration Form Card
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                ) {
+                AppCard {
                     Column(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -273,12 +247,7 @@ fun SplitOutputFormatScreen(
             }
 
             items(uiState.resolvedSplitPreviews, key = { it.trackNumber }) { preview ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.small,
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                ) {
+                AppCard(shape = MaterialTheme.shapes.small) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -313,62 +282,50 @@ fun SplitOutputFormatScreen(
             }
         }
 
-        // Sticky Bottom Split Action Bar
-        Surface(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surfaceContainer,
-            shadowElevation = 8.dp
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                if (rememberedFolder != null) {
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Button(
-                            onClick = { viewModel.executeFlacSplit(rememberedFolder) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp)
-                                .testTag("btn_split_to_remembered"),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Split to ${rememberedName ?: "last folder"}",
-                                style = MaterialTheme.typography.labelLarge,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                        TextButton(
-                            onClick = { outputFolderPicker.launch(null) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .testTag("btn_choose_output_and_split")
-                        ) {
-                            Text("Choose another folder", style = MaterialTheme.typography.labelLarge)
-                        }
-                    }
-                } else {
+        StickyActionBar(modifier = Modifier.align(Alignment.BottomCenter)) {
+            if (rememberedFolder != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Button(
-                        onClick = { outputFolderPicker.launch(null) },
+                        onClick = { viewModel.executeFlacSplit(rememberedFolder) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
-                            .testTag("btn_choose_output_and_split"),
+                            .height(Dimens.ButtonHeight)
+                            .testTag("btn_split_to_remembered"),
                         shape = MaterialTheme.shapes.medium
                     ) {
                         Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.labelLarge)
+                        Text(
+                            "Split to ${rememberedName ?: "last folder"}",
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
+                    TextButton(
+                        onClick = { outputFolderPicker.launch(null) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("btn_choose_output_and_split")
+                    ) {
+                        Text("Choose another folder", style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+            } else {
+                Button(
+                    onClick = { outputFolderPicker.launch(null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(Dimens.ButtonHeight)
+                        .testTag("btn_choose_output_and_split"),
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Select Output Folder & Split FLAC", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
+    }
     }
 }
